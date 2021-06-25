@@ -1,0 +1,568 @@
+            Spring框架
+
+Spring是为了解决企业开发的难度的 减轻对项目模块之间的管理 类和类之间的管理 帮助开发人员创建对象 管理对象之间的关系
+    <<!! Spring的核心: ioc , aop 能实现模块之间 类之间的解耦合 !!>>
+
+概述:
+    Spring本质上就是一个"Map"容器  在Spring配置文件的<bean id="" class="">中 指定要使用的类的路径 Spring就会把这个类路径
+    作为map的value值保存到一个map集合中。这个map集合的key值就是<bean>中自定义的id属性 value值就是<bean>中的class属性  Spring执行时
+    会把自动把这个value值创建为一个对象 当调用这个容器的key值时 就可以获得这个由Spring创建好的对象
+
+优势
+    低侵入 / 低耦合 （降低组件之间的耦合度，实现软件各层之间的解耦）
+    声明式事务管理（基于切面和惯例）
+    方便集成其他框架（如MyBatis、Hibernate）
+    降低 Java 开发难度
+    Spring 框架中包括了 J2EE 三层的每一层的解决方案（一站式）
+
+
+==================================================================================================================================
+
+一些概念
+    javaBean
+        javaBean是一种Java语言写成的可重用组件。为写成JavaBean，类必须是具体和公共的，并且具有无参数的构造器。还要实现Serializable接口
+        JavaBean通过提供符合一致性设计模式的公共方法将内部域暴露成员属性。更多的是一种规范，即包含一组set和get方法的java对象。
+        javaBean可以使应用程序更加面向对象，可以把数据封装起来，把应用的业务逻辑和显示逻辑分离开，降低了开发的复杂程度和维护成本。
+
+    pojo
+        Plain Ordinary Java Object 简单的Java对象，实际就是普通JavaBeans，是为了避免和EJB混淆所创造的简称。
+        其中有一些属性及其getter、setter方法的类，没有业务逻辑，有时可以作为VO（value-object）或DTO（Data Transfer Object）来使用。
+        不允许有业务方法，也不能携带connection之类的方法。与javaBean相比，javaBean则复杂很多，JavaBean是可复用的组件，对JavaBean并没有严格的规范，
+        理论上讲，任何一个Java类都可以是一个Bean。但通常情况下，由于JavaBean是被容器创建的，所以JavaBean应具有一个无参的构造器。
+        另外，通常JavaBean还要实现Serializable接口用于实现Bean的持久性。一般在web应用程序中建立一个数据库的映射对象时，我们只能称他为POJO。
+        用来强调它是一个普通的对象，而不是一个特殊的对象，其主要用来指代哪些没有遵从特定的java对象模型、约定或框架（如EJB）的java对象。
+        理想的讲，一个POJO是一个不受任何限制的java对象
+
+    entity
+        实体bean，一般是用于ORM对象关系映射，一个实体映射成一张表，一般无业务逻辑代码。负责将数据库中的表记录映射为内存中的Entity对象，
+        事实上，创建一个EntityBean对象相当于创建一条记录，删除一个EntityBean对象会同时从数据库中删除对应记录，修改一个Entity Bean时，
+        容器会自动将Entity Bean的状态和数据库同步
+
+    传统javabean与spring中的bean的区别
+        javabean已经没人用了, spring bean可以说是javabean的发展, 但已经完全不是一回事儿了
+        用处不同：传统javabean更多地作为值传递参数，而spring中的bean用处几乎无处不在，任何组件都可以被称为bean。
+        写法不同：传统javabean作为值对象，要求每个属性都提供getter和setter方法；但spring中的bean只需为接受设值注入的属性提供setter方法。
+        生命周期不同：传统javabean作为值对象传递，不接受任何容器管理其生命周期；spring中的bean有spring管理其生命周期行为。
+
+        所有可以被spring容器实例化并管理的java类都可以称为bean。
+
+        原来服务器处理页面返回的值都是直接使用request对象，后来增加了javabean来管理对象，所有页面值只要是和javabean对应，就可以用类.GET属性方法来获取值。
+        javabean不只可以传参数，也可以处理数据，相当与把一个服务器执行的类放到了页面上，使对象管理相对不那么乱（对比jsp的时候所有内容都在页面上完成）。
+        spring中的bean，是通过配置文件、javaConfig等的设置，由spring自动实例化，用完后自动销毁的对象。让我们只需要在用的时候使用对象就可以，
+            不用考虑如何创建类对象（这就是spring的注入）。一般是用在服务器端代码的执行上
+
+
+Bean的生命周期
+    先调用构造方法，然后使用set方法注入，之后init初始化，然后使用Bean，最后销毁
+
+
+==================================================================================================================================
+                                        spring框架结构
+
+核心容器(Spring core)
+    核心容器提供Spring框架的基本功能。Spring以bean的方式组织和管理Java应用中的各个组件及其关系。Spring使用BeanFactory来产生和管理Bean，
+    它是工厂模式的实现。BeanFactory使用控制反转(IoC)模式将应用的配置和依赖性规范与实际的应用程序代码分开。BeanFactory使用依赖注入的方式提供给组件依赖。
+
+Spring上下文(Spring context)
+    Spring上下文是一个配置文件，向Spring框架提供上下文信息。Spring上下文包括企业服务，如JNDI、EJB、电子邮件、国际化、校验和调度功能。
+    Spring面向切面编程(Spring AOP)通过配置管理特性，Spring AOP 模块直接将面向方面的编程功能集成到了 Spring框架中。所以，
+    可以很容易地使 Spring框架管理的任何对象支持 AOP。Spring AOP 模块为基于 Spring 的应用程序中的对象提供了事务管理服务。
+    通过使用 Spring AOP，不用依赖 EJB 组件，就可以将声明性事务管理集成到应用程序中。
+
+Spring DAO模块
+    DAO模式主要目的是将持久层相关问题与一般的的业务规则和工作流隔离开来。Spring 中的DAO提供一致的方式访问数据库，不管采用何种持久化技术，
+    Spring都提供一直的编程模型。Spring还对不同的持久层技术提供一致的DAO方式的异常层次结构。
+
+Spring面向切面编程(Spring AOP)
+    通过配置管理特性，Spring AOP 模块直接将面向方面的编程功能集成到了 Spring框架中。所以，可以很容易地使 Spring框架管理的任何对象支持 AOP。
+    Spring AOP 模块为基于 Spring 的应用程序中的对象提供了事务管理服务。通过使用 Spring AOP，不用依赖 EJB 组件，就可以将声明性事务管理集成到应用程序中。
+
+Spring ORM模块
+    Spring 与所有的主要的ORM映射框架都集成的很好，包括Hibernate、JDO实现、TopLink和IBatis SQLMap等。
+    Spring为所有的这些框架提供了模板之类的辅助类，达成了一致的编程风格。
+
+Spring Web模块
+    Web上下文模块建立在应用程序上下文模块之上，为基于Web的应用程序提供了上下文。Web层使用Web层框架，
+    可选的，可以是Spring自己的MVC框架，或者提供的Web框架，如Struts、Webwork、tapestry和jsf。
+
+Spring MVC框架(Spring WebMVC)
+    MVC框架是一个全功能的构建Web应用程序的MVC实现。通过策略接口，MVC框架变成为高度可配置的。
+    Spring的MVC框架提供清晰的角色划分：控制器、验证器、命令对象、表单对象和模型对象、分发器、处理器映射和视图解析器。Spring支持多种视图技术
+
+
+
+Bean的作用域
+    Spring IOC容器创建一个Bean实例时，可以为Bean指定实例的作用域，
+    作用域包括singleton（单例模式）、prototype（原型模式）、request（HTTP请求）、session（会话）、global-session（全局会话）。
+
+（1）Singleton
+    当一个bean的作用域为Singleton那么Spring IoC容器中只会存在一个共享的bean实例，并且所有对bean的请求，只要id与该bean定义相匹配，
+    则只会返回bean的同一实例。Singleton是单例类型，就是在创建起容器时就同时自动创建了一个bean的对象，不管你是否使用，他都存在了，
+    每次获取到的对象都是同一个对象。注意，Singleton作用域是Spring中的缺省作用域。要在XML中将bean定义成singleton，可以这样配置：
+        <bean id="userServiceImpl" class=""xx.xxx.xxxImpl">
+
+（2）Prototype
+    当一个bean的作用域为Prototype，表示一个bean定义对应多个对象实例。Prototype作用域的bean会导致在每次对该bean请求
+    （将其注入到另一个bean中，或者以程序的方式调用容器的getBean()方法）时都会创建一个新的bean实例。Prototype是原型类型，它在我们创建容器
+    的时候并没有实例化，而是当我们获取bean的时候才会去创建一个对象，而且我们每次获取到的对象都不是同一个对象。
+    根据经验，对有状态的bean应该使用prototype作用域，而对无状态的bean则应该使用singleton作用域。在XML中将bean定义成prototype，可以这样配置：
+        <bean id="account" class="xxx.xxx.entity.User" scope="1 prototype"/>
+
+（3）Request
+    当一个bean的作用域为Request表示在一次HTTP请求中，一个bean定义对应一个实例；即每个HTTP请求都会有各自的bean实例，
+    它们依据某个bean定义创建而成。该作用域仅在基于web的Spring ApplicationContext情形下有效。考虑下面bean定义：
+        <bean id="loginAction" class="com.xinzhi.entity.User" scope="request"/>
+
+（4）Session
+    当一个bean的作用域为Session，表示在一个HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。
+    考虑下面bean定义：
+        <bean id="userPreferences" class="com.xinzhi.entity.User" scope="session"/>
+
+    针对某个HTTP Session，Spring容器会根据userPreferences bean定义创建一个全新的
+    userPreferences bean实例，且该userPreferences bean仅在当前HTTP Session内有效。与request作
+    用域一样，可以根据需要放心的更改所创建实例的内部状态，而别的HTTP Session中根据
+    userPreferences创建的实例，将不会看到这些特定于某个HTTP Session的状态变化。当HTTP Session
+    最终被废弃的时候，在该HTTP Session作用域内的bean也会被废弃掉。
+
+
+==================================================================================================================================
+                                                    IOC容器
+
+IoC(Inversion of Control: 控制反转):
+    <<!!是一个理论/概念/思想 把对象的创建 赋值 管理工作都交给"容器"来创建/实现!!>> 自己只需要在配置文件中写参数即可 此功能是由DI实现的
+    就像servlet的对象是浏览器完成创建的 使用IoC的目的就是减少对代码的改动 也能实现不同的功能 对业务对象之间的解耦合 例如service和dao对象之间的耦合
+        控制: 创建对象 对对象的属性赋值 对象之间的关系管理。当前对象对内成员的控制权
+        反转: 把原来开发人员管理 创建对象的权限交给容器实现, 由容器代替开发人员管理创建对象 给属性赋值
+        正转: 由开发人员在代码中 使用new构造方法创建对象 给属性赋值。开发人员主动管理对象
+        容器: 是一个服务器软件 一个框架(spring)
+
+DI:
+    DI(Dependency Injection:依赖注入)是ioc的技术实现 只需要在程序中提供要使用的对象名称就可以了
+    spring是使用DI实现的IoC功能的 spring底层是使用反射机制创建对象的
+
+    DI的实现有两种:
+        1.在spring的配置文件中 使用标签属性完成 叫做基于XML的di实现
+        2.使用spring中的注解 完成属性赋值 叫做基于注解的di实现
+
+    使用DI创建SpringBean对象:
+        在spring配置文件中配置<bean>标签: <bean id=" " class=" "/>
+            id: 自定义的别名 代表了class属性指定的类
+            class: 类的全限定名称(spring使用的反射机制创建的对象 所以只能写类名)
+        spring会把<bean>创建成对象并且保存进map集合中 这个集合中的key值就是<bean>的id属性 value就是<bean>的Class属性
+        Spring封装的<bean>的Map集合: map.put("XXX","new com.xu.Student()")
+
+        ApplicationContext: 表示Spring容器 在创建spring容器的时候 会创建配置文件中标识的所有对象, 并且把创建好的对象保存到spring容器的value值中
+        ClassPathXmlApplicationContext:从类路径加载spring的配置文件
+            --- ApplicationContext ac = new ClassPathXmlApplicationContext(config.xml);
+
+        通过Spring容器的key值拿到对应的value值的对象(此时value表示的类已经是一个对象了)
+        "getBean"这个方法返回的对象就是Spring容器中创建好的对象
+            --- SomeServlet someServlet = (SomeServlet) ac.getBean(bean标签的id);
+
+    基于xml的DI实现 给SpringBean的属性赋值:
+                    <property>和<constructor-arg>都是在<bean>中编写的，就是在bean创建时对其成员参数进行赋值
+        1.set注入: spring调用Bean的set方法 往set方法传入参数对其进行赋值。如果只有属性 没有set方法 此时给属性赋值就会报错
+            <property name="" value=""/>: name是Bean的参数名
+
+        2.构造注入: Spring调用Bean中的构造方法 往构造方法中传入参数完成赋值。构造方法中如果没有对应的形参 则会编译报错
+            <constructor-arg name="" value=""/>: 按参数名称注入
+            <constructor-arg index="" value=""/>: 按位置注入，index是构造方法的形参列表的位置 从零开始
+            <constructor-arg value=""/>: 直接注入 按照形参列表的顺序注入
+            <constructor-arg type="" value=""/>: 按照构造方法的参数的数据类型注入
+
+            set注入和构造注入都可以注入其他类型的数据
+                <property name="" value="" />  基本数据注入
+                <property name="user" ref="userREF"/>  引用类型注入(引用类型注入 需要使用自动注入或者使用<bean>声明出引用 把引用的id放到这里)
+                    <bean id="userREF" class="com.xu.userDao"> <property name='' value=''></property> </bean>
+
+                <property name=""> <array> <value></value> </array> </property>  数组注入
+                <property name=""> <list> <value></value> </list> </property>  list注入
+                <property name=""> <set> <value></value> </set> </property>  set注入
+                <property name="familyTies"> <map> <entry key="" value="" /> </map> </property>  map注入
+                <property name="workExperience"> <props> <prop key="">xxxx</prop> </props> </property>  property注入
+                <property name="daughter"><null /></property>  null注入
+
+        标签中ref引用类型的自动注入
+            3.自动注入(按属性名称注入): 当bean中的"ref引用类型"的参数名称和<bean>的id名称一致时 在<bean>中
+                使用"autowire="byName"" spring就会把id属性表示的类赋值给当前bean中的引用类型
+
+                如果使用了自动注入，spring就会把下面那个<bean id="AAA">自动注入到当前这个Bean中
+                当前这个bean就不需要写<property id="aaa" ref="AAA">引入AAA了
+                    <bean id="user" class="com.xu.user" autowire="byName">
+                        <property id="aaa" ref="AAA">
+                    </bean>
+                    <bean id="AAA" class="xxx">
+                        <property id="xxx" class="xxx">
+                    </bean>
+
+                从javaBean的set方法获取名字，如setAAA，就去spring容器中找名字为AAA的bean。如果有，就取出注入；
+                如果没有，就不注入。所有名称不能出现错误，名称错了就找不到要注入的这个bean了
+
+            4.自动注入(按类型注入): 当bean中的"ref引用类型"的参数和<bean>的class属性类型是同源关系时在<bean>中
+                使用"autowire="byType"" spring就会把class属性表示的类赋值给当前bean中的引用类型
+                同源: 同一类
+                    java类中引用类型的数据类型和<bean>的class属性的值是一样的
+                    java类中引用类型的数据类型和<bean>的class属性的值是父子关系
+                    java类中引用类型的数据类型和<bean>的class属性的值是接口和实现类关系
+
+
+        主配置文件:
+            当配置文件多了以后 可以使用一个只存放配置文件路径的主配置文件包裹所有配置文件 读取时只需要读取主配置文件即可
+                <import resource="classpath:配置文件的路径">: 指定配置文件的路径 多个配置文件中的<bean>不可以发生冲突!
+                <import resource="classpath:*.*">: 通配符的读取形式
+                    1.多个配置文件必须在同一级文件中 否则读取不到
+                    2.通配符的匹配结果中不可以包括主配置文件自身 会出现死循环
+
+
+    基于注解的DI实现 给SpringBean的属性赋值:
+        1.在配置文件中创建一个组件扫描器:
+            <context:component-scan base-package="使用了注解的类"/>
+            组件扫描器会扫描指定的包和子包中的所有类 查找带有注解的类 将其创建为对象或者赋值
+
+        2.注解给属性赋值:
+            给普通类型赋值:
+                @Value(value=""): 声明在类中的属性上 给这个属性直接赋值(必须先声明当前类 把当前类创建为对象), 声明在set方法上 使用set方法进行赋值
+            给引用类型赋值:
+                @Autowired: 声明在引用类型上 使用的是按类型自动注入(byType) 需要先把引用类型的类声明创建为对象
+                    required属性: 如果为true 表示如果引用类型赋值失败 程序报错并终止(建议使用 可以尽早发现问题)
+                                 如果为false 表示如果引用类型赋值失败 程序正常执行 引用类型赋值null
+
+                @Qualifier(value=""): 和@Autowired注解一起声明 使用的是按属性自动注入(byName) value值要和引用类型指定的名称一致
+
+                @Resource: 来自jdk javax.annotation包中的注解 需要导入依赖  可以用来给引用类型赋值 默认使用的是"byName"自动注入
+                    spring会先使用"byName"自动注入 如果byName注入失败 就会使用byType自动注入。如果指定"name"属性 则只使用byName注入
+                                        注意: 必须先使用配置文件/注解把类声明为对象才可以对其进行赋值操作
+
+        3.使用"ClassPathXmlApplicationContext"对象的"getBean"方法 读取在@Component注解中给的别名"value" 获得被注解标识的类的对象
+            @Component如果没有指定value的别名 spring会默认使用类名(首字母小写)的方式进行命名
+
+
+    使用配置类给Bean的属性赋值初始化
+        类上需要使用@Configuration, 此注解会把此类放入到容器中。方法上是使用@Bean
+        使用classPathXmlApplication()的getBean("usera")方法获取方法即可。
+            @Configuration
+            public class userConfig {
+                @Bean
+                public User usera(){
+                    return new User(){{
+                        setName("小怜");
+                        setAge(18);
+                        setEx("test");
+                    }};
+                }
+            }
+
+
+    分层开发
+        三层架构: controller: 界面层 service: 业务逻辑层 dao: 持久层。
+        区分层次的目的即为了"高内聚低耦合"的思想。在软件体系架构设计中，分层式结构是最常见，也是最重要的一种结构。
+        微软推荐的分层式结构一般分为三层，从下至上分别为:数据访问层、业务逻辑层(又或称为领域层)、表示层。
+
+        注解(创建对象):
+            @Mapper: 持久层的注解 放在dao的实现类上面 表示创建dao对象 dao对象是能访问数据库的
+            @Service: 放在业务层类的上面 在service的实现类上面 表示创建service对象 service对象是做业务处理 可以有事务等功能
+            @Controller: 放在控制器的上面 放在控制器(处理器)类上面 表示创建控制器对象的 控制器对象能接受用户提交的参数 显示请求的处理结果
+            @Component: 创建对象的 等同于<bean>的功能 value是对象的名称 也就是<bean>的id值(如果不指定 默认就是类名的首字母小写"student")
+                value值是唯一的 创建的对象在整个spring容器中就一个 此注解必须在类的上面定义 等同于创建了一个Student的对象并存入到容器
+
+            当一个类不是这三个注解所表示的范围内 使用"@Component"注解
+
+
+==========================================================================================================================
+
+
+AOP(Aspect Orient Programming: 面向切面编程):
+    什么是AOP
+        AOP（Aspect Oriented Programming）称为面向切面编程，在程序开发中主要用来解决一些系统层面上的问题，比如日志，事务，权限等待。
+            在不改变原有的逻辑的基础上，增加一些额外的功能。代理也是这个功能。
+
+        AOP可以说是OOP（Object Oriented Programming，面向对象编程）的补充和完善。OOP引入封装、继承、多态等概念来建立一种对象层次结构，
+            用于模拟公共行为的一个集合。不过OOP允许开发者定义纵向的关系，但并不适合定义横向的关系，例如日志功能。日志代码往往横向地散布
+            在所有对象层次中，而与它对应的对象的核心功能毫无关系对于其他类型的代码，如安全性、异常处理和透明的持续性也都是如此，
+            这种散布在各处的无关的代码被称为横切（cross cutting），在OOP设计中，它导致了大量代码的重复，而不利于各个模块的重用。
+
+        AOP技术恰恰相反，它利用一种称为"横切"的技术，剖解开封装的对象内部，并将那些影响了多个类的公共行为封装到一个可重用模块，
+            并将其命名为"Aspect"，即切面。所谓"切面"，简单说就是那些与业务无关，却为业务模块所共同调用的逻辑或责任封装起来，
+            便于减少系统的重复代码，降低模块之间的耦合度，并有利于未来的可操作性和可维护性。
+
+        使用"横切"技术，AOP把软件系统分为两个部分：核心关注点和横切关注点。业务处理的主要流程是核心关注点，与之关系不大的部分是横切关注点。
+            横切关注点的一个特点是，他们经常发生在核心关注点的多处，而各处基本相似，比如权限认证、日志、事物。
+            AOP的作用在于分离系统中的各种关注点，将核心关注点和横切关注点分离开来。
+
+
+    AOP就是动态代理的规范化 AOP把动态代理的实现步骤 方式都定义好了 让使用者用一种统一的方式进行操作
+    AOP可以在目标类源代码不改变的情况下增加功能 较少代码的重复 专注业务逻辑代码 解耦合让业务功能和非业务功能分离
+       什么时候用AOP?
+            例如有一个类 需要给他增加功能, 但是没有源代码 此时就可以使用AOP给他增加切面
+            项目中有多个类都需要实现相同的功能 使用AOP
+            给项目增加事务 日志输出
+
+    Aspect(切面): 给你的目标类"增加的功能"就是切面 像日志 事务等都是切面
+        切面的特点: 一般都是非业务方法(业务就是处理逻辑的 非业务就是跟业务逻辑没关系的,可以独立使用的)
+        切面的三个关键要素:
+            1.切面的功能代码 切面要干什么
+            2.切面的执行代码 使用Pointcut(切入点)表示切面执行的位置
+            3.切面的执行时间 使用Advice(通知/增强)表示执行时间 是在目标方法之前还是在之后
+
+    AOP的实现 底层使用的是动态代理模式实现的 有两种:
+        1.JDK的动态代理: 使用的是jdk中的Proxy Method InvocationHandler创建代理对象 jdk的动态代理要求目标类必须实现接口
+        2.CGLIB的动态代理: 使用的是第三方的工具库创建代理对象 原理是继承 通过继承目标类创建子类 子类就是代理对象 要求目标类不可以是final的
+            CGLIB(Code Generator Library)是一个强大的、高性能的代码生成库。其被广泛应用于AOP框架(Spring、dynaop)中，用以提供方法拦截操作。
+
+    自动选择:
+        当有接口时 AOP会选择"JDK"动态代理(必须实现接口)    当没有接口时 AOP会使用"CGLIB"动态代理(目标类不可以时final的)
+        当有接口时还想使用"CGLIB"时 在配置文件中使用"<aop:aspectj-autoproxy proxy-target-class="true"/>"即可
+
+    和AOP相关的名词：
+        通知、增强处理（Advice）
+            就是你想要的功能，也就是上说的安全、事物、日子等。你给先定义好，然后再想用的地方用一下。包含Aspect的一段处理代码
+
+        连接点（JoinPoint）
+            就是spring允许你是通知（Advice）的地方，那可就真多了，基本每个方法的钱、后（两者都有也行），或抛出异常是时都可以是连接点，
+            spring只支持方法连接点。其他如AspectJ还可以让你在构造器或属性注入时都行，不过那不是咱们关注的，只要记住，和方法有关的前前后后都是连接点。
+
+        切入点（Pointcut）
+            上面说的连接点的基础上，来定义切入点，你的一个类里，有15个方法，那就有十几个连接点了对吧，但是你并不想在所有方法附件
+            都使用通知（使用叫织入），你只是想让其中几个，在调用这几个方法之前、之后或者抛出异常时干点什么，那么就用切入点来定义这几个方法，
+            让切点来筛选连接点，选中那几个你想要的方法。
+
+        切面（Aspect）
+            切面是通知和切入点的结合。现在发现了吧，没连接点什么事，连接点就是为了让你好理解切点搞出来的，明白这个概念就行了。
+            通知说明了干什么和什么时候干（什么时候通过方法名中的before，after，around等就能知道），二切入点说明了在哪干（指定到底是哪个方法），
+            这就是一个完整的切面定义。
+
+        引入（introduction）
+            允许我们向现有的类添加新方法属性。这不就是把切面（也就是新方法属性：通知定义的）用到目标类中吗
+
+        目标（target）
+            引入中所提到的目标类，也就是要被通知的对象，也就是真正的业务逻辑，他可以在毫不知情的情况下，被咱们织入切面。二自己专注于业务本身的逻辑。
+
+        织入（weaving）
+            把切面应用到目标对象来创建新的代理对象的过程。SpringAOP中，通过Advice定义横切逻辑，
+            Spring中支持5种类型的Advice:即 Aop 在 不改变原有代码的情况下 , 去增加新的功能
+
+AOP的aspectJ框架
+    aspectJ: 一个开源的专门做AOP的框架 来自eclipse的一个项目 Spring中集成了aspectj框架 通过spring就能直接使用aspectj
+    实现:
+        0.pom依赖: org.aspectj   aspectjweaver
+        1.使用' @Aspect '注解声明一个切面类, 切面类中创建切面方法，切面方法上使用切入点表达式指定要给谁加切面
+        2.创建目标对象 目标对象需要实现一个接口(JDK动态代理实现接口 CGlib继承类)
+        3.在配置文件中使用"<aop:aspectj-autoproxy/>"标签创建一个"自动代理生成器"
+            aspect就会在内存中修改"目标对象"的结构 给其增加切面方法
+        注意事项:
+            使用getBean()时 只能转换为同级的接口 不能转换为接口的实现类, 否则会报错
+            AopTest aopTestImpl = (AopTest) ac.getBean("aopTestImpl");
+
+    切入点表达式(切入点表达式所表示的方法就是"目标对象" 被切入注解标注的方法就是"连接点"):
+        execution(方法的修饰符列表 方法的返回值 接口中的方法名(方法的形参列表))
+            "*"  :  匹配任何数量字符
+            "+"  :  匹配指定类型的子类型 仅能作为后缀放在类型模式后边
+            ".." :  匹配任何数量字符的重复 如在类型模式中匹配任何数量子包 而在方法参数模式中匹配任何数量参数
+
+    1.切面的执行时间 这个执行时间叫做Advice(通知/增强) 在aspectj框架中使用注解表示
+        @After: 在类上声明 可以把类变成一个切面类。在方法上声明 可以让方法变为最终通知(总会被执行 在业务代码后执行 一般做资源清除工作的)
+            @After(value = "execution()") public void A(){}
+
+        @Before: 切入时间 在切面执行之前执行
+            @Before(value = "execution()") public void A(JoinPoint jp) {}
+
+        @AfterReturning: 切入时间 在切面之后执行 需要指定一个"returning = " ""属性 表示目标方法的返回值
+            @AfterReturning(value = "execution()", returning = "name") public void A(JoinPoint join, Object name) {}
+
+        @Around: 环绕通知 可以在目标方法之前和之后增加功能, 控制目标方法是否被调用, 修改原来的目标方法的执行结果
+            @Around(value = "execution()") public Object A(ProceedingJoinPoint pj){
+                pj.proceed();   执行目标方法
+            }
+
+        @AfterThrowing: 异常通知 当程序出现异常之后 会执行这个切面
+            @AfterThrowing(value = "execution()", throwing = "ex") public void A(Exception ex){}
+
+        @Pointcut: 这个注解是用来定义和管理切入点的 如果项目中有多个重复的切入点表达式 就可以使用"@Pointcut"声明
+            @Pointcut(value = "execution()")
+            public void Pointcut(){}
+
+            @Before(value = "Pointcut()")
+            public void A() {}
+
+
+==========================================================================================================================
+
+
+Spring整合MyBatis:
+    1.使用spring的IOC技术 把MyBatis框架中使用的对象交给Spring统一创建和管理
+        数据源DataSource对象: 连接数据库的 java中规定实现了javax.sql.DataSource接口的都是数据源 这个接口是用来获取Connection连接的
+        SqlSessionFactory对象: 使用的是"SqlSessionFactoryBean"在内部创建"SqlSessionFactory"对象
+        DAO代理对象: 使用的"MapperScannerConfigurer"对象 在此对象内部调用"gatMapper()"方法 创建接口的Dao对象并保存进Spring容器中
+
+    2.把MyBatis的getMapper方法创建对象 的工作交给了Spring的"MapperScannerConfigurer"类来完成
+    3.MyBatis获取"SqlSessionFactory"对象 创建DAO对象 等操作都是在Spring配置文件中完成的
+
+
+    实现:
+        1.创建一个Spring的配置文件 在Spring配置文件中使用<bean>指定mybatis的信息(这个配置文件的操作是固定的)
+            1) 声明数据库的连接信息和"数据源"信息
+                创建"DruidDataSource"数据源对象
+                    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+                        <property name="username" value="mysql账号"/>
+                        <property name="password" value="mysql密码"/>
+                        <property name="url" value="jdbc:mysql://localhost:3306/数据库?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf8"/>
+                        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                    </bean>
+
+                创建"jdbcTemplate"对象(不创建也可以)
+                    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+                        <property name="dataSource" ref="dataSource"/>
+                    </bean>
+
+            2) 创建sqlSessionFactory对象 使用"SqlSessionFactoryBean"类
+                <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+                    <property name="dataSource" ref="dataSource"/>
+                    <property name="mapperLocations" value="classpath:com/xu/mapper/*.xml"/>    扫描mapper.xml文件
+                </bean>
+
+            3) 创建DAO对象 使用"MapperScannerConfigurer"类
+                <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+                    <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+                    <property name="basePackage" value="mapper文件的包"/>
+                </bean>
+
+==========================================================================================================================
+
+
+spring的事务处理
+    事务是指:一组sql语句的集合 集合中有多条sql语句 可能是insert update select delete 我们希望这些多个sql语句都能成功或者都失败
+    这些sql语句的执行是一致的 作为一个整体执行
+
+    在什么时候想到使用事务?
+        当我的操作 涉及得到多个表 或者是多个sql语句的insert update delete 需要保证这些语句都是成功才能完成我的功能,或者都失败 保证操作是符合要求的
+
+    在java代码中写程序 控制事务 此时事务应该放在那里呢?
+        service类的业务方法上，因为业务方法会调用多个dao方法，执行多个sql语句
+
+    不同的数据库访问技术 处理事务的对象 方法不同 需要了解不同数据库访问技术使用事务的原理
+    所以Spring提供了一种处理事务的统一模型 能使用统一步骤 方式完成多种不同数据库访问技术的事务处理
+
+    实现:
+        spring处理事务的模型 使用的步骤都是固定的 把事务使用的信息提供给spring就可以了
+
+        1 事务内部提交 回滚事务 使用的事务管理器对象 代替你完成commit rollback
+            事务管理器是一个接口和他的众多实现类
+                接口: PlatformTransactionManager 定义了事务重要方法commit rollback
+                实现类: spring把每一种数据库访问技术对应的事务处理类都创建好了
+                    mybatis访问数据库---spring创建好的是DataSourceTransactionManager
+                    hibernate访问数据库----spring创建的是HibernateTransactionManager
+
+            怎么使用:
+                你需要告诉spring 你用是那种数据库的访问技术 声明数据库访问技术对于的事务管理器实现类
+                在spring的配置文件中使用<bean>声明就可以了 例如: 要使用mybatis访问数据库 应该在xml配置文件中
+                    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+                        <property name="dataSource" ref="dataSource"/>
+                    </bean>
+
+        2 你的业务方法需要什么样的事务,说明需要事务的类型
+            说明方法需要的事务:
+                事务的隔离级别: 有4个值
+                    DEFAULT：采用 DB 默认的事务隔离级别。MySql 的默认为 REPEATABLE_READ； Oracle默认为 READ_COMMITTED。
+                    ➢ READ_UNCOMMITTED：读未提交。未解决任何并发问题。
+                    ➢ READ_COMMITTED：读已提交。解决脏读，存在不可重复读与幻读。
+                    ➢ REPEATABLE_READ：可重复读。解决脏读、不可重复读，存在幻读
+                    ➢ SERIALIZABLE：串行化。不存在并发问题。
+
+            事务的超时时间: 表示一个方法最长的执行时间 如果方法执行时超过了时间 事务就回滚。单位是秒 整数值 默认是 -1
+
+        3 事务的传播行为: 控制业务方法是不是有事务的 是什么样的事务的
+            7个传播行为 表示你的业务方法调用时 事务在方法之间是如果使用的
+              * PROPAGATION_REQUIRED:
+                    方法必须在事务内执行 如果当前方法有事务就加入到当前事务中,如果当前方法没有事务则新建一个新事务
+              * PROPAGATION_REQUIRES_NEW:
+                    指定的方法支持当前事务 如果当前方法没有事务 也可以执行
+              * PROPAGATION_SUPPORTS:
+                    指定的方法总是会新建一个事务 如果当前存在事务 则将其挂起,执行完指定方法的事务后才执行当前事务
+
+                PROPAGATION_MANDATORY
+                PROPAGATION_NESTED
+                PROPAGATION_NEVER
+                PROPAGATION_NOT_SUPPORTED
+
+        4 事务提交事务，回滚事务的时机
+            当你的业务方法 执行成功 没有异常抛出 当方法执行完毕 spring在方法执行后提交事务。事务管理器commit(提交)
+
+            当你的业务方法抛出"运行时异常"或ERROR spring执行回滚 调用事务管理器的rollback(回滚)
+               运行时异常的定义: RuntimeException  和他的子类都是运行时异常 例如NullPointException NumberFormatException
+
+            当你的业务方法抛出非运行时异常 主要是受查异常时 提交事务
+               受查异常: 在你写代码中 必须处理的异常 例如IOException, SQLException
+
+        @Transactional实现:
+            适合中小项目使用的注解方案 Spring框架自己用aop实现给业务方法增加事务的功能 使用@Transactional注解添加事务 此注解
+            是Spring框架自己的注解 放在public方法上面 表示当前方法具有事务 可以给注解的属性赋值 表示具体的隔离级别 传播行为 异常信息等等
+                1.在<bean>中声明事务管理器对象
+                    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+                        <property name="dataSource" ref="dataSource"/>
+                    </bean>
+
+                2.开启事务注解驱动 告诉Spring 要使用注解的方式管理事务
+                    <tx:annotation-driven transaction-manager="transactionManager"/>
+                    Spring使用aop机制 创建@Transactional所在的类代理对象 给方法加入事务的功能
+                    Spring给业务方法加入事务: 在业务方法执行之前先开启事务 在业务方法之后提交或者回滚事务 使用aop的环绕通知
+
+                3.如果事务执行失败了 检查一下application.xml配置文件头有没有 xmlns:tx="http://www.springframework.org/schema/tx" 属性
+
+
+        配置文件实现:
+            适合大型项目 有很多的类/方法 需要大量的配置事务,使用aspectj框架功能 在spring配置文件中声明类/方法需要的事务 这种方式业务方法和事务配置完全分离
+                1.声明事务管理器对象:<bean id="" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+                2 声明方法需要的事务类型(配置方法的事务属性【隔离级别 传播行为 超时】)
+                3 配置aop: 指定哪些哪类要创建代理
+
+
+    总结spring的事务
+        1.管理事务的是 事务管理和他的实现类
+        2.spring的事务是一个统一模型
+            1）指定要使用的事务管理器实现类，使用<bean>
+            2）指定哪些类，哪些方法需要加入事务的功能
+            3）指定方法需要的隔离级别，传播行为，超时
+
+        你需要告诉spring，你的项目中类信息，方法的名称，方法的事务传播行为。
+
+
+=======================================================================================================================================
+
+
+web项目中使用容器对象
+    怎么实现:
+        使用监听器 当全局作用域对象被创建时 创建容器 存入ServletContext
+
+      * 使用监听器创建的容器对象 只会被创建一次 可以一直使用, 不适用监听器 程序运行一次 容器对象创建一次 很浪费内存!!!
+
+        1.在web.xml配置文件中注册监听器"ContextLoaderListener"
+            监听器被创建对象后会读取"applicationContext.xml"文件 因为在监听器中要创建"ApplicationContext"对象 创建这个对象需要加载配置文件
+            读取配置文件的默认的路径就是"WEB-INF/applicationContext.xml"  如果配置文件不在此目录可以用<context-param>修改这个默认值
+            <context-param>
+                <param-name>contextConfigLocation</param-name>   contextConfigLocation:表示配置文件的路径
+                <param-value>classpath:applicationContext.xml</param-value>   配置文件的路径
+            </context-param>
+                                        注册监听器
+            <listener>
+                <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+            </listener>
+
+        2.从全局作用域"ServletContext"中获取容器对象"WebApplicationContext"即可
+
+    监听器作用:
+        1 创建容器对象: 执行ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        2 把容器对象放入到ServletContext: ServletContext.setAttribute(key,ctx)
+                                        key: WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
+                                        value: this.context(容器对象)
+            监听器会把"容器对象"保存在全局作用域对象中 想要获得"容器对象"就需要使用"getAttribute"方法 通过key值获得全局作用域中保存的
+            这个对象"WebApplicationContext容器对象" 使用这个容器对象的"getBean"方法获得对象
+
+            监听器可以自己创建, 也可以使用框架中提供好的ContextLoaderListener
+                ApplicationContext: javaSE项目中使用的容器对象
+                WebApplicationContext: web项目中的使用的容器对象
+                WebApplicationContext在底层继承了Application类
+
+
+
+
+                                            Spring官网: sprint.io

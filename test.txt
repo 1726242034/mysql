@@ -1,0 +1,51 @@
+
+递归的经验总结:
+    使用Entity、Bean、对象等封装数据会发生数据覆盖的情况, 不要在递归B中修改递归A的数据 会发生数据覆盖的情况。
+    多个对象的引用地址一样就会发生覆盖的问题 即文件B的对象覆盖掉了文件A的对象。
+    所以可以把对象转换成json串保存在起来 json串时String没有内存地址所以不存在对象覆盖的问题
+
+
+出现的异常
+    Invalid bound statement (not found) 找不到绑定语句
+        mapper配置文件没有编译到target文件中
+
+    GET请求URI中有特殊字符和中文则需要进行编码
+        前端传输数据时 会出现请求URI出现乱码的情况 导致后端接收到的数据也是乱码, 因为网络标准RFC 1738做了硬性规定：
+        只有字母和数字[0-9a-zA-Z]、一些特殊符号“$-_.+!*'(),”[不包括双引号]、以及某些保留字，才可以不经过编码直接用于URL
+        encodeURI和decodeURI: 返回编码为有效的统一资源标识符(URI)的字符串，不会被编码的字符：! @ # $ & * ( ) = : / ; ? + '
+
+    springboot中 读取application配置文件内的中文出现乱码, 在application文件中配置
+        banner.charset=UTF-8
+        server.tomcat.uri-encoding=UTF-8
+        spring.http.encoding.charset=UTF-8
+        spring.http.encoding.enabled=true
+        spring.http.encoding.force=true
+        spring.messages.encoding=UTF-8
+        设置中的 Editor -->  File Encodings修改编码格式
+
+    非法字符: '\ufeff'
+        idea右下角编码 先转换为GBK再转为UTF8
+
+    后台如果要接收JSON类型的字符串 则必须在形参上添加@RequestBody注解
+
+    web端WebSocket对象的ip地址如果是localhost 访问页面时就填localhost, 如果是IP地址 就填IP地址
+
+    WebSocket配置类中sec.getUserProperties()添加session对象时出现null，
+        可能是因为页面在创建WebSocket对象的时候 session对象还没有创建完成 然后sec.getUserProperties()方法就添加了session 导致添加了空对象
+        解决: 在web页面创建WebSocket对象之前 手动创建一个Session对象
+
+    thymeleaf模板出现" Error resolving templ ate [XXX], template might not exist "模板可能不存在
+        controller访问模板的请求是"/file"  而thymeleaf在构建URL时默认是"classpath:/templates/", 就导致了Controller请求URL变成了"//file"
+        修改Application.properties配置文件: spring.thymeleaf.prefix=classpath:/templates; spring.thymeleaf.suffix=.html
+
+
+    springboot无法直接读取jar包中的文件 只能使用流来进行读取
+        但是只可以读取文件 不可以读取文件夹, 所以要把文件的名称保存成一个文件 然后读取这个文件
+        ClassPathResource resource = new ClassPathResource("static/directory.txt");         classes下的文件
+        byte[] keywordsData = FileCopyUtils.copyToByteArray(resource.getInputStream());     使用流读取到文件并复制给一个byte数组
+        String s = new String(keywordsData, Charset.forName("utf-8"));                      把数组转换为字符串
+
+
+
+
+

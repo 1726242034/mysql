@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xu.mapper.UserTest">
+
+    <select id="selectUser" resultType="com.xu.dao.User">
+        select * from usera;
+    </select>
+
+    <update id="updateUser" parameterType="com.xu.dao.User">
+        update usera set age = #{upAge} where age = #{age}
+    </update>
+
+    <delete id="deleteUser" parameterType="com.xu.dao.User">
+        delete from usera where age = #{age}
+    </delete>
+
+</mapper>
+

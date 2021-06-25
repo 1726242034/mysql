@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+
+    <!-- 注解扫描器 -->
+    <context:component-scan base-package="com.xu"/>
+
+    <!-- 自动代理生成器 -->
+    <aop:aspectj-autoproxy/>
+
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="root"/>
+        <property name="password" value="love500"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/dd?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- mapper.xml文件所在的位置 -->
+        <property name="mapperLocations" value="classpath:com/xu/mapper/*.xml"/>
+    </bean>
+
+    <!-- mapper扫描器: 扫描包下的mapper.xml文件 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.xu.mapper"/>
+    </bean>
+
+    <bean id="userServiceImpl" class="com.xu.service.UserServiceImpl">
+        <property name="userDao" ref="userTest"/>
+    </bean>
+
+
+    <!--    注解使用的 声明事务管理器
+              使用Spring的事务处理            -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 指定数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+    <!-- 开启事务注解，并配置一个事务管理器 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+</beans>
+

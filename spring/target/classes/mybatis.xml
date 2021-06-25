@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- settings: 控制mybatis全局行为 -->
+    <settings>
+        <!-- 设置mybatis输出日志 把操作数据库的信息打印到控制台上
+                "logImpl":控制日志  "STDOUT_LOGGING":把日志输出到控制台上 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+</configuration>
