@@ -108,6 +108,7 @@ ssh免密登录
 idea继承git
     idea需要先把idea的目录初始文件忽略掉 因为这些文件与项目无关 不参与服务器上部署运行。
     在idea中打开: File | Settings | Version Control | GitHub, 添加github账户。
+    在工具栏上点击Git 追踪文件，之后右键项目--Git--Commit Directory即可提交文件到本地库
 
 
 
