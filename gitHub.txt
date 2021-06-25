@@ -105,12 +105,15 @@ ssh免密登录
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-idea继承git
+idea集成git
     idea需要先把idea的目录初始文件忽略掉 因为这些文件与项目无关 不参与服务器上部署运行。
     在idea中打开: File | Settings | Version Control | GitHub, 添加github账户。
-    在工具栏上点击Git 追踪文件，之后右键项目--Git--Commit Directory即可提交文件到本地库
+        使用账号密码登录很难成功 可以使用口令登录 在web端的Settings-->DeveloperSettings内即可生成口令
+    在工具栏上点击Git 追踪文件，之后右键项目-->Git-->CommitDirectory即可提交文件到本地库。
+    在工具栏上点击Git--Branches即可创建新的分支。
 
-
+ssh免密登录进行push
+    点击导航栏的Git-->Push-->master分支上点击'define remote' 自定义一个远程连接方式 把远程库的ssh链接复制过来即可
 
 
 
